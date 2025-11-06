@@ -110,3 +110,60 @@ void verif(liste_d_adjacence *l) {
   return;
 }
 
+char *getId(int num) {
+  static char id[4];
+  if (num <= 26) {
+    id[0] = 'A' + num - 1;
+    id[1] = '\0';
+  } else {
+    id[0] = 'A' + (num - 27) / 26;
+    id[1] = 'A' + (num - 27) % 26;
+    id[2] = '\0';
+  }
+  return id;
+}
+
+void export_mermaid(liste_d_adjacence *G, const char *filename) {
+  FILE *f = fopen(filename, "wt");
+  if (f == NULL) {
+    perror("Erreur ouverture fichier Mermaid");
+    exit(EXIT_FAILURE);
+  }
+
+  fprintf(f, "---\n");
+  fprintf(f, "config:\n");
+  fprintf(f, "  layout: elk\n");
+  fprintf(f, "  theme: neo\n");
+  fprintf(f, "  look: neo\n");
+  fprintf(f, "---\n\n");
+  fprintf(f, "flowchart LR\n");
+
+  for (int i = 0; i < G->nbr; i++) {
+    fprintf(f, "%s((%d))\n", getId(i+1), i+1);
+  }
+
+  for (int i = 0; i < G->nbr; i++) {
+    cellule *c = G->adjacente[i].head;
+    while (c != NULL) {
+      fprintf(f, "%s-->|%.2f|", getId(i+1), c->p);
+      fprintf(f, "%s\n", getId(c->sommet));
+      c = c->next;
+    }
+  }
+  fclose(f);
+}
+
+//partie 2:
+
+t_tarjan_vertex *creer_tab_tarjan_vertex(liste_d_adjacence *G) {
+  t_tarjan_vertex *tab = malloc(G->nbr * sizeof(t_tarjan_vertex));
+
+  for (int i = 0; i < G->nbr; i++) {
+    tab[i].id = i+1;
+    tab[i].num = -1;
+    tab[i].num_acces = -1;
+    tab[i].indicateur = 0;
+  }
+
+  return tab;
+}

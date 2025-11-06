@@ -2,28 +2,13 @@
 #include <stdlib.h>
 #include "fonctions.h"
 
-int main(void) {
-    printf("=== TEST LECTURE GRAPHE ===\n\n");
+int main() {
+    printf("=== TEST TARJAN : lecture du graphe + création du tableau ===\n\n");
 
+    // Lecture du graphe depuis un fichier
     liste_d_adjacence G = readGraph("scratch.txt");
+    export_mermaid(&G, "test");
 
-    printf("Contenu du graphe lu depuis le fichier :\n");
-    afficher_liste_d_adjacence(&G);
 
-    verif(&G);
-
-    // Libération mémoire
-    for (int i = 0; i < G.nbr; i++) {
-        cellule *tmp = G.adjacente[i].head;
-        while (tmp) {
-            cellule *next = tmp->next;
-            free(tmp);
-            tmp = next;
-        }
-    }
-
-    free(G.adjacente);
-
-    printf("\nFin du test.\n");
     return 0;
 }
