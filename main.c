@@ -3,11 +3,18 @@
 #include "fonctions.h"
 
 int main() {
-    printf("=== TEST TARJAN : lecture du graphe + création du tableau ===\n\n");
-
-    // Lecture du graphe depuis un fichier
+    // Chargement du graphe depuis un fichier texte
     liste_d_adjacence G = readGraph("scratch.txt");
-    export_mermaid(&G, "test");
+    t_partition partition = tarjan(&G);
+
+    // Affiche la partition finale
+    for (int i = 0; i < partition.nbr; i++) {
+        printf("Classe %d : ", i + 1);
+        for (int j = 0; j < partition.classes[i]->nbr; j++) {
+            printf("%d ", partition.classes[i]->sommets[j]->id);
+        }
+        printf("\n");
+    }
 
 
     return 0;

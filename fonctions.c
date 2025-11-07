@@ -86,7 +86,7 @@ liste_d_adjacence readGraph(const char *filename) {
     }
 
     fclose(file);
-    return l; // retourner la liste d’adjacence remplie
+    return l;
 }
 
 void verif(liste_d_adjacence *l) {
@@ -154,7 +154,6 @@ void export_mermaid(liste_d_adjacence *G, const char *filename) {
 }
 
 //partie 2:
-
 t_tarjan_vertex *creer_tab_tarjan_vertex(liste_d_adjacence *G) {
   t_tarjan_vertex *tab = malloc(G->nbr * sizeof(t_tarjan_vertex));
 
@@ -166,4 +165,91 @@ t_tarjan_vertex *creer_tab_tarjan_vertex(liste_d_adjacence *G) {
   }
 
   return tab;
+}
+
+void initStack(t_pile *pile) {
+  pile->nbElts = 0;
+}
+
+int isEmptyStack(t_pile *pile) {
+  return pile->nbElts == 0;
+}
+
+void push(t_pile *pile, int value) {
+  if (pile->nbElts < NBMAX) {
+    pile->values[pile->nbElts] = value;
+    pile->nbElts++;
+  } else {
+    printf("Erreur : pile pleine !\n");
+  }
+}
+
+void *pop(t_pile *stack) {
+  if (stack->nbElts == 0) {
+    printf("Erreur : pile vide !\n");
+    return NULL;
+  }
+  stack->nbElts--;
+  return stack->values[stack->nbElts];
+}
+
+
+int min(int a, int b) {
+  if (a>b) return b;
+  else return a;
+}
+
+void parcours(liste_d_adjacence *G, int num, int v, t_tarjan_vertex *tab, t_pile *pile, t_partition *partition) {
+  tab[v].num = num;
+  tab[v].num_acces = num;
+  num++;
+  push(pile, v);
+  tab[v].indicateur = true;
+
+  int w;
+  cellule *temp = G->adjacente[v].head;
+  while(temp != NULL){
+    w = temp->sommet-1;
+    if (tab[w].num == -1) {
+      parcours(G, num, w, tab, pile, partition);
+      tab[v].num_acces = min(tab[v].num_acces, tab[w].num_acces);
+    }else {
+      tab[v].num_acces = min(tab[v].num_acces, tab[w].num);
+    }
+    temp = temp->next;
+  }
+
+  if (tab[v].num_acces == tab[v].num) {
+    t_classe *c = malloc(sizeof(t_classe));
+    c->nbr = 0;
+    c->sommets = malloc(G->nbr * sizeof(t_tarjan_vertex *));
+    do {
+      w = pop(pile);
+      tab[w].indicateur = false;
+      c->sommets[c->nbr] = &tab[w];
+      c->nbr++;
+    } while (w != v);
+    partition->classes = realloc(partition->classes, (partition->nbr + 1) * sizeof(t_classe *));
+    partition->classes[partition->nbr] = c;
+    partition->nbr++;
+  }
+}
+
+t_partition tarjan(liste_d_adjacence *G){
+  t_tarjan_vertex *tab = creer_tab_tarjan_vertex(G);
+  t_pile pile;
+  initStack(&pile);
+
+  t_partition partition;
+  partition.nbr = 0;
+  partition.classes = NULL;
+
+  int num = 0;
+
+  for (int i = 0; i < G->nbr; i++) {
+    if (tab[i].num == -1) {
+      parcours(G, &num, i, tab, &pile, &partition);
+    }
+  }
+  return partition;
 }

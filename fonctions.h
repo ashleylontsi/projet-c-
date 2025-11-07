@@ -6,7 +6,7 @@
 #ifndef FONCTIONS_H
 #define FONCTIONS_H
 
-#endif //FONCTIONS_H
+#endif
 
 #include <stdbool.h>
 
@@ -56,9 +56,17 @@ typedef struct {
 
 t_tarjan_vertex *creer_tab_tarjan_vertex(liste_d_adjacence *G);
 
-typedef struct stack
-{
-    struct stack *prev;
-    struct stack *next;
-    void *data;
-} stack_s;
+#define NBMAX 100
+
+typedef struct s_pile {
+    void *values[NBMAX];
+    int nbElts;
+} t_pile;
+
+void initStack(t_pile *pile);
+int isEmptyStack(t_pile *pile);
+void push(t_pile *pile, int value);
+void *pop(t_pile *pile);
+
+void parcours(liste_d_adjacence *G, int num, int v, t_tarjan_vertex *tab, t_pile *pile, t_partition *partition);
+t_partition tarjan(liste_d_adjacence *G);
