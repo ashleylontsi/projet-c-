@@ -72,6 +72,20 @@ t_partition tarjan(liste_d_adjacence *G);
 
 void trouver_liens_classes_simple(liste_d_adjacence *G, t_partition *partition) ;
 
+typedef struct {
+    int depart;
+    int arrive;
+}lien;
+
+typedef struct {
+    lien *tab;
+    int nbr;
+    int capacite;
+}liens;
+
+int *creer_tab_classe_sommets(liste_d_adjacence *G, t_partition *partition);
+liens *hausse(liste_d_adjacence *G, t_partition *partition);
+
 // Structure pour les liens entre classes
 typedef struct {
     int classe_depart;

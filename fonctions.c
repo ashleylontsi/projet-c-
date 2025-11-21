@@ -263,41 +263,66 @@ t_partition tarjan(liste_d_adjacence *G){
 
 //Partie 2 : Etape 2
 
-void trouver_liens_classes_simple(liste_d_adjacence *G, t_partition *partition) {
-  printf("=== LIENS ENTRE CLASSES ===\n");
+int *creer_tab_classe_sommets(liste_d_adjacence *G, t_partition *partition) {
+  int *classeSommet = malloc(G->nbr * sizeof(int));
 
-  // Créer un tableau pour savoir à quelle classe appartient chaque sommet
-  int *classe_du_sommet = malloc((G->nbr + 1) * sizeof(int));
-
-  // Remplir le tableau d'appartenance
   for (int c = 0; c < partition->nbr; c++) {
-    for (int s = 0; s < partition->classes[c]->nbr; s++) {
-      int sommet_id = partition->classes[c]->sommets[s]->id;
-      classe_du_sommet[sommet_id] = c;
+    t_classe *classe = partition->classes[c];
+
+    for (int s = 0; s < classe->nbr; s++) {
+      int idSommet = classe->sommets[s]->id;
+      classeSommet[idSommet - 1] = c + 1;
     }
   }
 
-  // Parcourir tous les sommets du graphe
-  for (int i = 1; i <= G->nbr; i++) {
-    int classe_i = classe_du_sommet[i];
+  return classeSommet;
+}
 
-    // Parcourir tous les voisins du sommet i
-    cellule *voisin = G->adjacente[i-1].head;
-    while (voisin != NULL) {
-      int j = voisin->sommet;
-      int classe_j = classe_du_sommet[j];
+liens *hausse(liste_d_adjacence *G, t_partition *partition) {
 
-      // Si les classes sont différentes, il y a un lien
-      if (classe_i != classe_j) {
-        printf("Classe %d -> Classe %d\n", classe_i+1, classe_j+1);
+  int *classeSommet = creer_tab_classe_sommets(G, partition);
+
+  liens *liens = malloc(sizeof(liens));
+  liens->nbr = 0;
+  liens->capacite = 50;
+  liens->tab = malloc(liens->capacite * sizeof(lien));
+
+  int ci, cj;
+
+  for (int i = 0; i < G->nbr; i++) {
+
+    ci = classeSommet[i];
+    cellule *temp = G->adjacente[i].head;
+
+    while (temp != NULL) {
+
+      cj = classeSommet[temp->sommet - 1];
+
+      if (ci != cj) {
+
+        bool existe = false;
+        for (int s = 0; s < liens->nbr; s++) {
+          if (liens->tab[s].depart == ci &&
+              liens->tab[s].arrive == cj) {
+            existe = true;
+            break;
+              }
+        }
+
+        if (!existe) {
+          liens->tab[liens->nbr].depart = ci;
+          liens->tab[liens->nbr].arrive = cj;
+          liens->nbr++;
+        }
       }
 
-      voisin = voisin->next;
+      temp = temp->next;
     }
   }
 
-  free(classe_du_sommet);
+  return liens;
 }
+
 
 //Partie 2 : Etape 3
 
@@ -428,3 +453,4 @@ void analyser_caracteristiques(t_partition *partition, t_link_array *link_array)
 
     free(classe_a_sorties);
 }
+
