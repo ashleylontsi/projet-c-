@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//Partie 1 : Etape 1
+
 cellule *creer_cellule(int sommet, float p, cellule *next){
   cellule *c;
   c = malloc(sizeof(cellule));
@@ -89,6 +91,8 @@ liste_d_adjacence readGraph(const char *filename) {
     return l;
 }
 
+//Partie 1 : Etape 2
+
 void verif(liste_d_adjacence *l) {
   float a;
 
@@ -109,6 +113,8 @@ void verif(liste_d_adjacence *l) {
   printf("Le graphe est un graphe de Markov\n");
   return;
 }
+
+//Partie 1 : Etape 3
 
 char *getId(int num) {
   static char id[4];
@@ -153,7 +159,8 @@ void export_mermaid(liste_d_adjacence *G, const char *filename) {
   fclose(f);
 }
 
-//partie 2:
+//Partie 2: Etape 1
+
 t_tarjan_vertex *creer_tab_tarjan_vertex(liste_d_adjacence *G) {
   t_tarjan_vertex *tab = malloc(G->nbr * sizeof(t_tarjan_vertex));
 
@@ -252,4 +259,172 @@ t_partition tarjan(liste_d_adjacence *G){
     }
   }
   return partition;
+}
+
+//Partie 2 : Etape 2
+
+void trouver_liens_classes_simple(liste_d_adjacence *G, t_partition *partition) {
+  printf("=== LIENS ENTRE CLASSES ===\n");
+
+  // Créer un tableau pour savoir à quelle classe appartient chaque sommet
+  int *classe_du_sommet = malloc((G->nbr + 1) * sizeof(int));
+
+  // Remplir le tableau d'appartenance
+  for (int c = 0; c < partition->nbr; c++) {
+    for (int s = 0; s < partition->classes[c]->nbr; s++) {
+      int sommet_id = partition->classes[c]->sommets[s]->id;
+      classe_du_sommet[sommet_id] = c;
+    }
+  }
+
+  // Parcourir tous les sommets du graphe
+  for (int i = 1; i <= G->nbr; i++) {
+    int classe_i = classe_du_sommet[i];
+
+    // Parcourir tous les voisins du sommet i
+    cellule *voisin = G->adjacente[i-1].head;
+    while (voisin != NULL) {
+      int j = voisin->sommet;
+      int classe_j = classe_du_sommet[j];
+
+      // Si les classes sont différentes, il y a un lien
+      if (classe_i != classe_j) {
+        printf("Classe %d -> Classe %d\n", classe_i+1, classe_j+1);
+      }
+
+      voisin = voisin->next;
+    }
+  }
+
+  free(classe_du_sommet);
+}
+
+//Partie 2 : Etape 3
+
+// Fonction pour créer un tableau de liens
+t_link_array* creer_link_array() {
+    t_link_array *link_array = malloc(sizeof(t_link_array));
+    link_array->nbr_liens = 0;
+    link_array->capacite = 10;
+    link_array->liens = malloc(link_array->capacite * sizeof(t_lien));
+    return link_array;
+}
+
+// Fonction pour ajouter un lien
+void ajouter_lien(t_link_array *link_array, int classe_depart, int classe_arrivee) {
+    // Vérifier si le lien existe déjà
+    for (int i = 0; i < link_array->nbr_liens; i++) {
+        if (link_array->liens[i].classe_depart == classe_depart &&
+            link_array->liens[i].classe_arrivee == classe_arrivee) {
+            return;
+        }
+    }
+
+    // Redimensionner si nécessaire
+    if (link_array->nbr_liens >= link_array->capacite) {
+        link_array->capacite *= 2;
+        link_array->liens = realloc(link_array->liens, link_array->capacite * sizeof(t_lien));
+    }
+
+    // Ajouter le nouveau lien
+    link_array->liens[link_array->nbr_liens].classe_depart = classe_depart;
+    link_array->liens[link_array->nbr_liens].classe_arrivee = classe_arrivee;
+    link_array->nbr_liens++;
+}
+
+// Fonction pour trouver les liens entre classes
+t_link_array* trouver_liens_classes(liste_d_adjacence *G, t_partition *partition) {
+    t_link_array *link_array = creer_link_array();
+
+    // Créer un tableau pour savoir à quelle classe appartient chaque sommet
+    int *appartenance = malloc((G->nbr + 1) * sizeof(int));
+    for (int i = 0; i <= G->nbr; i++) {
+        appartenance[i] = -1;
+    }
+
+    // Remplir le tableau d'appartenance
+    for (int c = 0; c < partition->nbr; c++) {
+        for (int s = 0; s < partition->classes[c]->nbr; s++) {
+            int sommet_id = partition->classes[c]->sommets[s]->id;
+            appartenance[sommet_id] = c;
+        }
+    }
+
+    // Parcourir tous les sommets du graphe
+    for (int i = 1; i <= G->nbr; i++) {
+        int classe_i = appartenance[i];
+
+        // Parcourir tous les voisins du sommet i
+        cellule *voisin = G->adjacente[i-1].head;
+        while (voisin != NULL) {
+            int j = voisin->sommet;
+            int classe_j = appartenance[j];
+
+            // Si les classes sont différentes, il y a un lien
+            if (classe_i != classe_j) {
+                ajouter_lien(link_array, classe_i, classe_j);
+            }
+
+            voisin = voisin->next;
+        }
+    }
+
+    free(appartenance);
+    return link_array;
+}
+
+// Fonction pour analyser les caractéristiques (étape 3)
+void analyser_caracteristiques(t_partition *partition, t_link_array *link_array) {
+    printf("\n=== ETAPE 3 - CARACTERISTIQUES DU GRAPHE ===\n");
+
+    // Tableau pour savoir si une classe a des liens sortants
+    int *classe_a_sorties = calloc(partition->nbr, sizeof(int));
+
+    // Marquer les classes qui ont des liens sortants
+    for (int i = 0; i < link_array->nbr_liens; i++) {
+        int classe_depart = link_array->liens[i].classe_depart;
+        classe_a_sorties[classe_depart] = 1;
+    }
+
+    // Afficher si les classes sont transitoires ou persistantes
+    printf("\n--- Analyse des classes ---\n");
+    for (int c = 0; c < partition->nbr; c++) {
+        if (classe_a_sorties[c]) {
+            printf("Classe %d: TRANSITOIRE - {", c);
+        } else {
+            printf("Classe %d: PERSISTANTE - {", c);
+        }
+
+        // Afficher les sommets de la classe
+        for (int s = 0; s < partition->classes[c]->nbr; s++) {
+            printf("%d", partition->classes[c]->sommets[s]->id);
+            if (s < partition->classes[c]->nbr - 1) {
+                printf(",");
+            }
+        }
+        printf("}\n");
+    }
+
+    // Vérifier s'il y a des états absorbants
+    printf("\n--- Etats absorbants ---\n");
+    int etats_absorbants = 0;
+    for (int c = 0; c < partition->nbr; c++) {
+        if (!classe_a_sorties[c] && partition->classes[c]->nbr == 1) {
+            etats_absorbants++;
+            printf("Etat %d est ABSORBANT\n", partition->classes[c]->sommets[0]->id);
+        }
+    }
+    if (etats_absorbants == 0) {
+        printf("Aucun état absorbant\n");
+    }
+
+    // Vérifier si le graphe est irréductible
+    printf("\n--- Irreductibilite ---\n");
+    if (partition->nbr == 1) {
+        printf("Le graphe de Markov est irreductible\n");
+    } else {
+        printf("Le graphe de Markov n'est pas irreductible\n");
+    }
+
+    free(classe_a_sorties);
 }

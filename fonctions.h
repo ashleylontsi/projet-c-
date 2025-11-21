@@ -1,7 +1,3 @@
-//
-// Created by loanl on 04/11/2025.
-//
-
 
 #ifndef FONCTIONS_H
 #define FONCTIONS_H
@@ -9,6 +5,8 @@
 #endif
 
 #include <stdbool.h>
+
+//Partie 1
 
 typedef struct cellule {
     int sommet;
@@ -37,7 +35,8 @@ void verif(liste_d_adjacence *l);
 char *getId(int num);
 void export_mermaid(liste_d_adjacence *G, const char *filename);
 
-//partie 2:
+//Partie 2:
+
 typedef struct {
     int id, num, num_acces;
     bool indicateur;
@@ -70,3 +69,22 @@ void *pop(t_pile *pile);
 
 void parcours(liste_d_adjacence *G, int num, int v, t_tarjan_vertex *tab, t_pile *pile, t_partition *partition);
 t_partition tarjan(liste_d_adjacence *G);
+
+void trouver_liens_classes_simple(liste_d_adjacence *G, t_partition *partition) ;
+
+// Structure pour les liens entre classes
+typedef struct {
+    int classe_depart;
+    int classe_arrivee;
+} t_lien;
+
+typedef struct {
+    t_lien *liens;
+    int nbr_liens;
+    int capacite;
+} t_link_array;
+
+// Prototypes des fonctions étape 3
+t_link_array* trouver_liens_classes(liste_d_adjacence *G, t_partition *partition);
+void analyser_caracteristiques(t_partition *partition, t_link_array *link_array);
+
