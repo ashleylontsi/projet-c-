@@ -1,0 +1,16 @@
+flowchart TD
+    C1[1,5,7]:::transient
+    C2[2]:::persistent
+    C3[3,6,8]:::transient
+    C4[4]:::persistent
+    C5[9]:::transient
+    C6[10]:::transient
+
+    C6 --> C1
+    C6 --> C4
+    C1 --> C3
+    C3 --> C2
+    C3 --> C4
+
+    classDef transient fill:#ffcccc
+    classDef persistent fill:#ccffcc
