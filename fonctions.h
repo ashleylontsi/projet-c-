@@ -113,6 +113,7 @@ typedef struct {
 
 //Partie 3
 
+
 float **matrix_vide(int);
 /* On cr�er une matrice ayant 0 a chaque coef
    n (un entier) = taille de martice
@@ -160,4 +161,3 @@ connected components.
 specified component.
  */
 t_matrix subMatrix(t_matrix , t_partition , int);
-
