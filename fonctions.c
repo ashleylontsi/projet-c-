@@ -454,3 +454,78 @@ void analyser_caracteristiques(t_partition *partition, t_link_array *link_array)
     free(classe_a_sorties);
 }
 
+//Partie 3 : Etape 1
+
+float **matrix_vide(int n){
+  float **matrix = malloc(n * sizeof(float*));
+  for (int i= 0; i<n; i++){
+    matrix[i] = malloc(n * sizeof(float));
+    for (int j= 0; j<n; j++){
+      matrix[i][j] = 0;
+    }
+  }
+  return matrix;
+}
+
+void recopie_mat(float**N, float**M, int n){ // on va recopier N -> M
+  for (int i=0; i<n;i++){
+    for (int j=0; j<n; j++){
+      M[i][j] = N[i][j];
+    }
+  }
+}
+
+float **multi_mat(float **M, float **N, int n){
+  float **res = matrix_vide(n);
+  for(int i=0; i<n; i++){
+    for (int j=0; j<n; j++){
+      for(int k=0; k<n; k++){
+        res[i][j] += M[i][k]*N[k][j];
+      }
+    }
+  }
+  return res;
+}
+
+float diff_matrix(float **M, float **N, int n){
+  float somme = 0;
+  for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+      somme += fabsf(M[i][j] - N[i][j]);
+    }
+  }
+  return somme;
+}
+
+float **matrix_adj(liste_d_adjacence *liste_adj){
+  int n = l->nbr;
+  float **mat = matrix_vide(n);
+  for (int i = 0; i < n; i++) {
+    cellule *temp = l->adjacente[i].head;
+    while (temp != NULL) {
+      mat[i][temp->sommet] = temp->p;  //ici on attribut la probabilit� a sa position sans avoir a connaitre le sommet
+      temp = temp->next;
+    }
+  }
+
+  return mat;
+}
+
+
+t_matrix subMatrix(t_matrix matrix, t_partition part, int compo_index) {
+  t_classe *classe = part.classes[compo_index]; // R�cup�ration de la classe voulue
+  int n = classe->nbr;        // taille de la sous-matrice
+  t_matrix sub_mat;
+  sub_mat.n = n;  // Cr�ation d'une sous-matrice n�n
+  sub_mat.data = matrix_vide(n);
+  for (int a = 0; a < n; a++) {
+    int i = classe->sommets[a]->id;   // num�ro global du sommet
+    for (int b = 0; b < n; b++) {
+      int j = classe->sommets[b]->id;  // num�ro global du sommet
+      sub.data[a][b] = matrix.data[i][j];
+    }
+  }
+
+  return sub;
+}
+
