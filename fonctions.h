@@ -1,14 +1,8 @@
-
 #ifndef FONCTIONS_H
 #define FONCTIONS_H
 
-#endif
-
 #include <stdbool.h>
-#include "hasse.h"
-#ifndef MATRIX_H_INCLUDED
-#define MATRIX_H_INCLUDED
-#endif // MATRIX_H_INCLUDED
+
 
 //Partie 1
 
@@ -111,6 +105,7 @@ typedef struct {
     int n;
 } t_matrix;
 
+/***
 //Partie 3
 
 
@@ -120,28 +115,28 @@ float **matrix_vide(int);
    on renvoit le pointeur vers la matrice cr��e
 */
 
-void recopie_mat(float**, float**, int);
+//void recopie_mat(float**, float**, int);
 /*On recopie les valeurs d'une matrice a une autre de meme taille
   float**, float** sont les deux matrix que l'on va utiliser, sachant que ce sera les valeurs de la premi�re dans le deuxi�me
   int serait la taille de ces matrix
   on ne renvoie rien car les matrix directement modifi�es
 */
 
-float **multi_mat(float**, float**, int);
+//float **multi_mat(float**, float**, int);
 /*On veut faire une multiplication de matrices de meme taille
   int**, int** sont les deux matrices qu'on va utiliser
   int serait la taille de ces matrix
   on renvoie une matrix qui serait le resutalt de ces matrices
 */
 
-float diff_matrix(float**, float**, int);
+//float diff_matrix(float**, float**, int);
 /*On veut faire la difference de matrices de meme taille
   float**, float** sont les deux matrices qu'on va utiliser
   int serait la taille de ces matrix
   on renvoie la somme de cette difference
 */
 
-float **matrix_adj(liste_d_adjacence *);
+//float **matrix_adj(liste_d_adjacence *);
 /*On veut cr�er une matrice a partir de l'information d'une liste adjacente
   liste_d_adjacence * serait la liste adjacence
   on renvoie la matrix cr�er
@@ -160,4 +155,6 @@ connected components.
  * @return t_matrix The submatrix corresponding to the
 specified component.
  */
-t_matrix subMatrix(t_matrix , t_partition , int);
+//t_matrix subMatrix(t_matrix , t_partition , int);
+
+#endif

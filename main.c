@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "fonctions.h"
@@ -8,7 +9,7 @@ int main() {
 
     // Étape 1 - Chargement et vérification
     printf("--- ETAPE 1: Chargement et verification ---\n");
-    liste_d_adjacence G = readGraph("exemple1.txt");
+    liste_d_adjacence G = readGraph("scratch.txt");
     printf("Graphe charge avec %d sommets\n", G.nbr);
 
     verif(&G);

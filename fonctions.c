@@ -453,7 +453,7 @@ void analyser_caracteristiques(t_partition *partition, t_link_array *link_array)
 
     free(classe_a_sorties);
 }
-
+/*
 //Partie 3 : Etape 1
 
 float **matrix_vide(int n){
@@ -528,3 +528,4 @@ t_matrix subMatrix(t_matrix matrix, t_partition part, int compo_index) {
 
   return sub;
 }
+*/
